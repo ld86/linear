@@ -17,15 +17,15 @@ namespace NUtils {
 		}
 
 	template<typename T>
-		std::vector<T> SplitBy(const std::string& s, char c) {
+		std::vector<T> SplitBy(const std::string& s, const std::string& sep) {
 			auto l = 0;
-			auto r = s.find(c);
+			auto r = s.find(sep);
 			std::vector<T> result;
 
 			while (r != std::string::npos) {
 				result.push_back(FromString<T>(s.substr(l, r - l)));
-				l = r + 1;
-				r = s.find(c, l);
+				l = r + sep.length();
+				r = s.find(sep, l);
 			}
 
 			result.push_back(FromString<T>(s.substr(l)));
