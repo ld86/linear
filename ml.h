@@ -2,6 +2,8 @@
 
 #include <vector>
 #include <sstream>
+#include <memory>
+#include <random>
 
 namespace NML {
 
@@ -51,5 +53,68 @@ struct TLabeledExample {
 };
 
 using TLabeledBatch = std::vector<TLabeledExample>;
+
+class ILayer {
+public:
+    virtual std::vector<float> Forward(const std::vector<float>& in) const = 0;
+
+    ~ILayer() = default;
+};
+using ILayerPtr = std::unique_ptr<ILayer>;
+
+class TDense : public ILayer {
+public:
+    TDense(size_t in, size_t out)
+    : In(in)
+    , Out(out)
+    , Weights(Out, std::vector<float>(In, 0.0))
+    {
+        std::default_random_engine generator;
+        std::uniform_real_distribution<double> distribution(-1.0, 1.0);
+        for (int i = 0; i < Out; ++i) {
+            for (int j = 0; j < In; ++j) {
+                Weights[i][j] = distribution(generator);
+            }
+        }
+    }
+
+    std::vector<float> Forward(const std::vector<float>& in) const {
+        if (in.size() != In) {
+            throw std::runtime_error("in.size() != In");
+        }
+
+        std::vector<float> out(Out, 0);
+
+        for (int i = 0; i < Out; ++i) {
+            for (int j = 0; j < In; ++j) {
+                out[i] += Weights[i][j] * in[j];
+            }
+        }
+
+        return out;
+    }
+
+private:
+    size_t In;
+    size_t Out;
+    std::vector<std::vector<float>> Weights;
+};
+
+class TSequential {
+public:
+    void AddLayer(ILayerPtr&& layer) {
+        Layers.push_back(std::move(layer));
+    }
+
+    std::vector<float> Forward(std::vector<float> data) {
+        for (const ILayerPtr& layer : Layers) {
+            data = layer->Forward(data);
+        }
+        return data;
+    }
+
+private:
+    std::vector<ILayerPtr> Layers;
+};
 
 } // namespace NML
