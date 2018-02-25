@@ -1,52 +1,40 @@
 #pragma once
 
+#include <string>
 #include <vector>
 
 namespace NUtils {
-	template<typename T>
-		T FromString(const std::string&& s);
 
-	template<>
-		int FromString(const std::string&& s) {
-			return std::stoi(s);
+template<typename T>
+T FromString(const std::string&& s);
+
+template<> 
+int FromString(const std::string&& s);
+
+template<>
+float FromString(const std::string&& s);
+
+template<>
+std::string FromString(const std::string&& s);
+
+template<typename T>
+	std::vector<T> SplitBy(const std::string& s, const std::string& sep) {
+		auto l = 0;
+		auto r = s.find(sep);
+		std::vector<T> result;
+
+		while (r != std::string::npos) {
+			result.push_back(FromString<T>(s.substr(l, r - l)));
+			l = r + sep.length();
+			r = s.find(sep, l);
 		}
 
-	template<>
-		std::string FromString(const std::string&& s) {
-			return s;
-		}
-
-	template<typename T>
-		std::vector<T> SplitBy(const std::string& s, const std::string& sep) {
-			auto l = 0;
-			auto r = s.find(sep);
-			std::vector<T> result;
-
-			while (r != std::string::npos) {
-				result.push_back(FromString<T>(s.substr(l, r - l)));
-				l = r + sep.length();
-				r = s.find(sep, l);
-			}
-
-			result.push_back(FromString<T>(s.substr(l)));
-			return result;
-		}
-	
-	bool StartsWith(const std::string& s, const std::string& prefix) {
-		if (prefix.length() > s.length()) {
-			return false;
-		}
-
-		for (size_t i = 0; i < prefix.length(); ++i) {
-			if (s[i] != prefix[i]) {
-				return false;
-			}
-		}
-
-		return true;
+		result.push_back(FromString<T>(s.substr(l)));
+		return result;
 	}
 
-	bool Contains(const std::string& s, const std::string& what) {
-		return s.find(what) != std::string::npos;
-	}
-}
+bool StartsWith(const std::string& s, const std::string& prefix);
+bool Contains(const std::string& s, const std::string& what);
+
+
+} // namespace NUtils
