@@ -7,13 +7,15 @@ int Train(const NCli::TArguments& arguments) {
     NIO::TStreaming<NIO::TTSVParser> stream(filename);
 
     NML::TSequential model;
-    model.AddLayer(std::make_unique<NML::TDense>(4, 1));
+    model.AddLayer(std::make_unique<NML::TDense>(4, 3));
+    model.AddLayer(std::make_unique<NML::TSoftmax>());
 
     while (stream.HasNext()) {
         NML::TLabeledExample example = stream.Next();
         for (const auto i : model.Forward(example.X)) {
-            std::cout << i << std::endl;
+            std::cout << i << " ";
         }
+		std::cout << std::endl;
     }
 
     return 0;

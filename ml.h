@@ -4,6 +4,8 @@
 #include <sstream>
 #include <memory>
 #include <random>
+#include <cmath>
+#include <algorithm>
 
 namespace NML {
 
@@ -98,6 +100,24 @@ private:
     size_t In;
     size_t Out;
     std::vector<std::vector<float>> Weights;
+};
+
+class TSoftmax : public ILayer {
+    std::vector<float> Forward(const std::vector<float>& in) const {
+		float max = *std::max_element(in.begin(), in.end());
+
+		float sum = 0;
+		for (const float& i : in) {
+			sum += exp(i - max);
+		}
+
+		std::vector<float> result(in.size(), 0.0);
+		for (size_t i = 0; i < in.size(); ++i) {
+			result[i] = exp(in[i] - max) / sum;
+		}
+
+		return result;
+	}
 };
 
 class TSequential {
