@@ -2,6 +2,12 @@
 #include <mc.h>
 #include <io.h>
 
+std::vector<float> IrisOHE(float y) {
+	std::vector<float> result(3, 0.);
+	result[static_cast<int>(y)] = 1;
+	return result;
+}
+
 int Train(const NCli::TArguments& arguments) {
     std::string filename = arguments.GetParameter("i");
     NIO::TStreaming<NIO::TTSVParser> stream(filename);
@@ -12,11 +18,14 @@ int Train(const NCli::TArguments& arguments) {
 
     while (stream.HasNext()) {
         NML::TLabeledExample example = stream.Next();
-        for (const auto i : model.Forward(example.X)) {
-            std::cout << i << " ";
-        }
+		std::vector<float> yHat = model.Forward(example.X);
+		std::vector<float> y = IrisOHE(example.Y);
+
+		for (size_t i = 0; i < y.size(); ++i) {
+			std::cout << y[i] - yHat[i] << " ";
+		}
 		std::cout << std::endl;
-    }
+	}
 
     return 0;
 }
