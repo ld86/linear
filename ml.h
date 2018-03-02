@@ -102,6 +102,16 @@ private:
     std::vector<std::vector<float>> Weights;
 };
 
+class TRelu : public ILayer {
+    std::vector<float> Forward(const std::vector<float>& in) const {
+		std::vector<float> result(in.size(), 0.0);
+		for (size_t i = 0; i < in.size(); ++i) {
+			result[i] = std::max(0.f, in[i]);
+		}
+		return result;
+	}
+};
+
 class TSoftmax : public ILayer {
     std::vector<float> Forward(const std::vector<float>& in) const {
 		float max = *std::max_element(in.begin(), in.end());

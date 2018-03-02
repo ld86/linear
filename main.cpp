@@ -13,6 +13,8 @@ int Train(const NCli::TArguments& arguments) {
     NIO::TStreaming<NIO::TTSVParser> stream(filename);
 
     NML::TSequential model;
+    model.AddLayer(std::make_unique<NML::TDense>(4, 4));
+    model.AddLayer(std::make_unique<NML::TRelu>());
     model.AddLayer(std::make_unique<NML::TDense>(4, 3));
     model.AddLayer(std::make_unique<NML::TSoftmax>());
 
